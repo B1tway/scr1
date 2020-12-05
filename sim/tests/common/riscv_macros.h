@@ -103,13 +103,25 @@
 
 #define RVTEST_CODE_BEGIN                                               \
         .section .text.init;                                            \
-        .org 0xC0, 0x00;                                                \
         .balign  64;                                                    \
         .weak stvec_handler;                                            \
         .weak mtvec_handler;                                            \
-trap_vector:                                                            \
-        /* test whether the test came from pass/fail */                 \
-        csrr a4, mcause;                                                \
+trap_vector:                   				                \
+	/* check if exception is load misalign */			\
+	csrr a4, mcause;                                                \
+	li t0, 4;					\
+	bne a4, t0, check;					\
+	/* print exception message*/ 					\
+	la t0, exception_msg;						\
+	li t3, 0xF0000000;						\
+print_msg:								\
+	lb t4, 0(t0);							\
+	beqz t4, check;						\
+	sb t4, 0(t3);							\
+	addi t0, t0, 1;							\
+	j print_msg;							\
+	/* check if the test passed/failed */                 \
+check:								\
         li a5, CAUSE_USER_ECALL;                                        \
         beq a4, a5, _report;                                            \
         li a5, CAUSE_SUPERVISOR_ECALL;                                  \
@@ -133,6 +145,7 @@ _report:                                                                \
         j sc_exit;                                                      \
         .balign  64;                                                    \
         .globl _start;                                                  \
+.section .text.reset; \
 _start:                                                                 \
         RISCV_MULTICORE_DISABLE;                                        \
         /*INIT_SPTBR;*/                                                 \
@@ -196,6 +209,7 @@ _run_test:
 #define EXTRA_DATA
 
 #define RVTEST_DATA_BEGIN                                                       \
+        exception_msg: .string "lMisalign\n";                            \
         EXTRA_DATA                                                              \
         .pushsection .tohost,"aw",@progbits;                                    \
         .balign 64; .global tohost; tohost: .dword 0;                           \
