@@ -80,7 +80,7 @@ endif
 override ARCH=$(ARCH_tmp)
 
 # Use this parameter to enable tracelog
-TRACE ?= 0
+TRACE ?= 1
 
 ifeq ($(TRACE), 1)
     export SIM_TRACE_DEF = SCR1_TRACE_LOG_EN

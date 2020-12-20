@@ -2,5 +2,5 @@
 ARCH_lowercase = $(shell echo $(ARCH) | tr A-Z a-z)
 
 
-rv32_isa_tests += isa/rv32ui/add.S      \
-              isa/rv32ui/addi.S         \
+rv32_isa_tests += isa/rv32ui/addiu.S      \
+    isa/rv32ui/addi.S         \
