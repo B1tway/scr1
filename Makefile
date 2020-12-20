@@ -154,7 +154,7 @@ ifeq (,$(findstring e,$(ARCH_lowercase)))
 # These tests cannot be compiled for RVE
 
     # Comment this target if you don't want to run the riscv_isa
-    TARGETS += riscv_isa
+    # TARGETS += riscv_isa
 
     # Comment this target if you don't want to run the riscv_compliance
     # TARGETS += riscv_compliance
@@ -171,7 +171,7 @@ endif
 
 # Comment this target if you don't want to run the hello test
 # TARGETS += hello
-
+TARGETS += custom_instruction
 # Targets
 .PHONY: tests run_modelsim run_vcs run_ncsim run_verilator run_verilator_wf
 
@@ -206,7 +206,8 @@ riscv_compliance: | $(bld_dir)
 
 hello: | $(bld_dir)
 	-$(MAKE) -C $(tst_dir)/hello EXT_CFLAGS="$(EXT_CFLAGS)" ARCH=$(ARCH)
-
+custom_instruction: | $(bld_dir)
+	$(MAKE) -C $(tst_dir)/custom_instruction ARCH=$(ARCH)
 clean_hex: | $(bld_dir)
 	$(RM) $(bld_dir)/*.hex
 
@@ -289,5 +290,6 @@ clean:
 	$(MAKE) -C $(tst_dir)/benchmarks/dhrystone21 clean
 	$(MAKE) -C $(tst_dir)/riscv_isa clean
 	$(MAKE) -C $(tst_dir)/riscv_compliance clean
+	$(MAKE) -C $(tst_dir)/custom_instruction clean
 	$(RM) -R $(root_dir)/build/*
 	$(RM) $(test_info)
