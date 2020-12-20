@@ -301,6 +301,26 @@ always_comb begin
 `endif  // SCR1_RVE_EXT
                     end // SCR1_OPCODE_OP_IMM
 
+                    SCR1_OPCODE_OP_UIMM          : begin
+                        idu2exu_use_rs1_o         = 1'b1;
+                        idu2exu_use_rd_o          = 1'b1;
+                        idu2exu_use_imm_o         = 1'b1;
+                        idu2exu_cmd_o.imm         = {{20{1'b0}}, instr[31:20]};
+                        idu2exu_cmd_o.ialu_op     = SCR1_IALU_OP_REG_IMM;
+                        idu2exu_cmd_o.rd_wb_sel   = SCR1_RD_WB_IALU;
+                        case (funct3)
+                            3'b000  : idu2exu_cmd_o.ialu_cmd  = SCR1_IALU_CMD_ADD;        // ADDI
+                            3'b010  : idu2exu_cmd_o.ialu_cmd  = SCR1_IALU_CMD_SUB_LT;     // SLTI
+                            3'b011  : idu2exu_cmd_o.ialu_cmd  = SCR1_IALU_CMD_SUB_LTU;    // SLTIU
+                            3'b100  : idu2exu_cmd_o.ialu_cmd  = SCR1_IALU_CMD_XOR;        // XORI
+                            3'b110  : idu2exu_cmd_o.ialu_cmd  = SCR1_IALU_CMD_OR;         // ORI
+                            3'b111  : idu2exu_cmd_o.ialu_cmd  = SCR1_IALU_CMD_AND;        // ANDI
+                        endcase // funct3
+`ifdef SCR1_RVE_EXT
+                        if (instr[11] | instr[19])  rve_illegal = 1'b1;
+`endif  // SCR1_RVE_EXT
+                    end // SCR1_OPCODE_OP_UIMM
+
                     SCR1_OPCODE_MISC_MEM    : begin
                         case (funct3)
                             3'b000  : begin
